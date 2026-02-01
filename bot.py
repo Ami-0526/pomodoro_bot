@@ -3,6 +3,30 @@ from discord.ext import commands
 import asyncio
 import os
 
+from flask import Flask
+from threading import Thread
+import os
+
+# --- 追加: Webサーバーの設定 ---
+app = Flask('')
+
+@app.route('/')
+def main():
+    return "Bot is running!"
+
+def run():
+    # Koyebはポート8000を使用するのが一般的です
+    app.run(host="0.0.0.0", port=8000)
+
+def keep_alive():
+    server = Thread(target=run)
+    server.start()
+# ----------------------------
+
+# ... (これまでのBotのコード) ...
+
+
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -58,8 +82,10 @@ async def stop(ctx):
 
 from dotenv import load_dotenv
 load_dotenv()
-bot.run(os.getenv('DISCORD_TOKEN'))
 
-
+# 最後に起動部分を修正
+if __name__ == "__main__":
+    keep_alive()  # Webサーバーを起動
+    bot.run(os.getenv('DISCORD_TOKEN'))
 
 
